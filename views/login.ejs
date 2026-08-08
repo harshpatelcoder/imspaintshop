@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Paint Shop Inventory Management</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #F4F7FE;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 20px;
+    }
+    .login-card {
+      background: #FFFFFF;
+      max-width: 420px;
+      width: 100%;
+      padding: 50px 40px;
+      border-radius: 24px;
+      box-shadow: 0 10px 30px rgba(43, 54, 116, 0.08);
+    }
+    .logo-badge {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, #FF9C00, #FFC048);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      font-weight: 800;
+      font-size: 24px;
+      margin: 0 auto 20px auto;
+      box-shadow: 0 4px 12px rgba(255, 156, 0, 0.3);
+    }
+    .form-control-custom {
+      background-color: #F8FAFC;
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-size: 15px;
+      color: #2B3674;
+      transition: all 0.2s ease;
+    }
+    .form-control-custom:focus {
+      background-color: #FFFFFF;
+      border-color: #6366F1;
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.15);
+      outline: none;
+    }
+    .btn-signin {
+      background-color: #6366F1;
+      color: #FFFFFF;
+      border: none;
+      border-radius: 12px;
+      padding: 14px;
+      font-weight: 600;
+      font-size: 16px;
+      width: 100%;
+      transition: background-color 0.2s ease;
+    }
+    .btn-signin:hover {
+      background-color: #4F46E5;
+      color: #FFFFFF;
+    }
+    .form-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #2B3674;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card text-center">
+    <div class="logo-badge" id="app-login-logo">
+      S
+    </div>
+    <h3 class="fw-bold mb-1" style="color: #2B3674;">Welcome Back</h3>
+    <p class="text-muted small mb-4">Paint Shop Inventory Management</p>
+
+    <% if (error) { %>
+      <div class="alert alert-danger py-2 px-3 small border-0 mb-4 rounded-3 text-start" role="alert" id="login-error-alert">
+        <i class="fa-solid fa-circle-exclamation me-1"></i> <%= error %>
+      </div>
+    <% } %>
+
+    <form action="/login" method="POST" id="login-form">
+      <div class="mb-3 text-start">
+        <label for="email" class="form-label">Email Address</label>
+        <div class="input-group">
+          <input type="email" class="form-control form-control-custom" id="email" name="email" placeholder="admin@gmail.com" required autocomplete="email">
+        </div>
+      </div>
+
+      <div class="mb-4 text-start">
+        <label for="password" class="form-label">Password</label>
+        <div class="input-group">
+          <input type="password" class="form-control form-control-custom" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-signin" id="btn-login-submit">
+        <i class="fa-solid fa-right-to-bracket me-2"></i>Sign In
+      </button>
+    </form>
+    
+    <div class="mt-4 pt-3 border-top text-center text-muted small">
+      <span class="d-block text-secondary">Default Credentials:</span>
+      <span class="fw-medium text-dark me-2">admin@gmail.com</span> / <span class="fw-medium text-dark ms-2">123456</span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
