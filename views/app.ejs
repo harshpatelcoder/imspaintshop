@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paint Shop Inventory System</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    :root {
+      --sidebar-bg: #1B1C31;
+      --sidebar-hover: #2B2DFB;
+      --bg-color: #F4F7FE;
+      --text-main: #2B3674;
+      --text-muted: #A3AED0;
+      --card-radius: 20px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Styling */
+    .sidebar {
+      width: 280px;
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: var(--sidebar-bg);
+      color: #FFFFFF;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      z-index: 1040;
+      transition: all 0.3s ease;
+      overflow-y: auto;
+    }
+
+    .sidebar-brand {
+      padding: 30px 24px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand-logo {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, #FF9C00, #FFC048);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 20px;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(255, 156, 0, 0.3);
+    }
+
+    .brand-title {
+      font-size: 18px;
+      font-weight: 700;
+      line-height: 1.2;
+      margin: 0;
+    }
+
+    .brand-subtitle {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .sidebar-menu {
+      padding: 20px 16px;
+      flex-grow: 1;
+    }
+
+    .menu-section-title {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      padding: 12px 12px 6px 12px;
+      margin-top: 10px;
+    }
+
+    .nav-link-custom {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      color: var(--text-muted);
+      text-decoration: none;
+      border-radius: 12px;
+      font-weight: 500;
+      font-size: 14px;
+      margin-bottom: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-link-custom:hover {
+      color: #FFFFFF;
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+
+    .nav-link-custom.active {
+      color: #FFFFFF;
+      background-color: var(--sidebar-hover);
+      box-shadow: 0 4px 12px rgba(43, 45, 251, 0.3);
+    }
+
+    .nav-link-custom i {
+      font-size: 16px;
+      width: 20px;
+      text-align: center;
+    }
+
+    .sidebar-footer {
+      padding: 20px 16px;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .promo-card {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(43, 45, 251, 0.3));
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 16px;
+      padding: 16px;
+      text-align: center;
+      margin-bottom: 12px;
+    }
+
+    .promo-icon {
+      width: 36px;
+      height: 36px;
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 10px auto;
+      color: #FFC048;
+    }
+
+    /* Main Content Layout */
+    .main-wrapper {
+      margin-left: 280px;
+      min-height: 100vh;
+      padding: 24px 32px;
+      transition: all 0.3s ease;
+    }
+
+    @media (max-width: 991px) {
+      .sidebar {
+        transform: translateX(-100%);
+      }
+      .sidebar.show {
+        transform: translateX(0);
+      }
+      .main-wrapper {
+        margin-left: 0;
+        padding: 16px;
+      }
+    }
+
+    /* Top Navbar */
+    .top-navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-title-box h2 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-main);
+      margin: 0;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .search-input-group {
+      background: #FFFFFF;
+      border-radius: 30px;
+      padding: 6px 18px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 4px 14px rgba(43, 54, 116, 0.04);
+      border: 1px solid #E2E8F0;
+    }
+
+    .search-input-group input {
+      border: none;
+      outline: none;
+      background: transparent;
+      padding: 6px 10px;
+      font-size: 14px;
+      color: var(--text-main);
+    }
+
+    .icon-badge-btn {
+      width: 42px;
+      height: 42px;
+      background: #FFFFFF;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-muted);
+      box-shadow: 0 4px 14px rgba(43, 54, 116, 0.04);
+      position: relative;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid #E2E8F0;
+    }
+
+    .user-profile-badge {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: #FFFFFF;
+      padding: 6px 14px 6px 8px;
+      border-radius: 30px;
+      box-shadow: 0 4px 14px rgba(43, 54, 116, 0.04);
+      border: 1px solid #E2E8F0;
+    }
+
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+    }
+
+    /* Cards */
+    .card-custom {
+      background: #FFFFFF;
+      border-radius: var(--card-radius);
+      box-shadow: 0 10px 30px rgba(43, 54, 116, 0.05);
+      border: none;
+      padding: 22px;
+      margin-bottom: 24px;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .metric-card {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .metric-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      color: #FFFFFF;
+      flex-shrink: 0;
+    }
+
+    .metric-val {
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text-main);
+      line-height: 1.1;
+      margin-bottom: 2px;
+    }
+
+    .metric-label {
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* Table Styles */
+    .table-custom {
+      width: 100%;
+      vertical-align: middle;
+    }
+
+    .table-custom th {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid #E2E8F0;
+      padding: 12px 16px;
+    }
+
+    .table-custom td {
+      padding: 14px 16px;
+      border-bottom: 1px solid #F1F5F9;
+      color: var(--text-main);
+      font-size: 14px;
+    }
+
+    .badge-status {
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .badge-in { background-color: #E6F4EA; color: #137333; }
+    .badge-low { background-color: #FEF7E0; color: #B06000; }
+    .badge-out { background-color: #FCE8E6; color: #C5221F; }
+
+    .form-label-custom {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      margin-bottom: 6px;
+    }
+
+    .form-control-custom, .form-select-custom {
+      border: 1px solid #E2E8F0;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text-main);
+      background-color: #F8FAFC;
+    }
+
+    .form-control-custom:focus, .form-select-custom:focus {
+      border-color: #6366F1;
+      background-color: #FFFFFF;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div>
+      <div class="sidebar-brand">
+        <div class="brand-logo">S</div>
+        <div>
+          <div class="brand-title">SMS Paint</div>
+          <div class="brand-subtitle">Inventory System</div>
+        </div>
+      </div>
+
+      <div class="sidebar-menu">
+        <div class="menu-section-title">Main</div>
+        <a href="/app?page=dashboard" class="nav-link-custom <%= page === 'dashboard' ? 'active' : '' %>" id="nav-dashboard">
+          <i class="fa-solid fa-chart-pie"></i> Dashboard
+        </a>
+
+        <div class="menu-section-title">Inventory</div>
+        <a href="/app?page=inventory" class="nav-link-custom <%= page === 'inventory' ? 'active' : '' %>" id="nav-inventory">
+          <i class="fa-solid fa-boxes-stacked"></i> Inventory
+        </a>
+        
+        <% if (user && user.role === 'admin') { %>
+          <a href="/app?page=add_product" class="nav-link-custom <%= page === 'add_product' ? 'active' : '' %>" id="nav-add-product">
+            <i class="fa-solid fa-square-plus"></i> Add Product
+          </a>
+        <% } %>
+
+        <a href="/app?page=stock" class="nav-link-custom <%= page === 'stock' ? 'active' : '' %>" id="nav-stock">
+          <i class="fa-solid fa-arrows-rotate"></i> Stock Management
+        </a>
+
+        <a href="/app?page=low_stock" class="nav-link-custom <%= page === 'low_stock' ? 'active' : '' %>" id="nav-low-stock">
+          <i class="fa-solid fa-triangle-exclamation"></i> Low Stock
+          <% if (dashboard_stats && dashboard_stats.low_stock_count > 0) { %>
+            <span class="badge bg-warning text-dark ms-auto rounded-pill"><%= dashboard_stats.low_stock_count %></span>
+          <% } %>
+        </a>
+
+        <% if (user && user.role === 'admin') { %>
+          <a href="/app?page=reports" class="nav-link-custom <%= page === 'reports' ? 'active' : '' %>" id="nav-reports">
+            <i class="fa-solid fa-chart-line"></i> Product Reports
+          </a>
+        <% } %>
+
+        <div class="menu-section-title">Business</div>
+        <a href="/app?page=suppliers" class="nav-link-custom <%= page === 'suppliers' ? 'active' : '' %>" id="nav-suppliers">
+          <i class="fa-solid fa-truck-field"></i> Suppliers
+        </a>
+
+        <% if (user && user.role === 'admin') { %>
+          <a href="/app?page=staff" class="nav-link-custom <%= page === 'staff' ? 'active' : '' %>" id="nav-staff">
+            <i class="fa-solid fa-users-gear"></i> Staff
+          </a>
+        <% } %>
+
+        <div class="menu-section-title">Account</div>
+        <a href="/logout" class="nav-link-custom text-danger" id="nav-logout">
+          <i class="fa-solid fa-right-from-bracket"></i> Logout
+        </a>
+      </div>
+    </div>
+
+    <div class="sidebar-footer">
+      <div class="promo-card">
+        <div class="promo-icon"><i class="fa-solid fa-trophy"></i></div>
+        <h6 class="text-white fw-bold mb-1" style="font-size: 13px;">Keep it up!</h6>
+        <p class="text-muted mb-0" style="font-size: 11px;">Keep your stock organized and your business growing.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-wrapper">
+    
+    <!-- Top Navbar -->
+    <header class="top-navbar">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-light d-lg-none rounded-3 shadow-sm border" id="sidebar-toggle" onclick="document.getElementById('sidebar').classList.toggle('show')">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+        <div class="page-title-box">
+          <p class="text-muted small mb-0">Pages / <%= page.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) %></p>
+          <h2 id="current-page-heading"><%= page.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) %></h2>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <form action="/app" method="GET" class="search-input-group">
+          <input type="hidden" name="page" value="inventory">
+          <i class="fa-solid fa-magnifying-glass text-muted ms-1"></i>
+          <input type="text" name="search" placeholder="Search product, shade..." value="<%= filters ? filters.search : '' %>">
+        </form>
+
+        <div class="icon-badge-btn" title="Calendar">
+          <i class="fa-regular fa-calendar"></i>
+        </div>
+
+        <div class="icon-badge-btn" title="Notifications">
+          <i class="fa-regular fa-bell"></i>
+          <% if (dashboard_stats && (dashboard_stats.low_stock_count > 0 || dashboard_stats.out_of_stock_count > 0)) { %>
+            <span class="position-absolute top-0 start-100 translate-middle p-1 bg-danger border border-light rounded-circle"></span>
+          <% } %>
+        </div>
+
+        <div class="user-profile-badge">
+          <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(user.full_name) %>&background=6366F1&color=fff" alt="User Avatar" class="user-avatar">
+          <div class="d-none d-sm-block text-start">
+            <div class="fw-bold text-dark" style="font-size: 13px; line-height: 1.1;"><%= user.full_name %></div>
+            <div class="text-muted uppercase" style="font-size: 10px; font-weight: 700; text-transform: uppercase;"><%= user.role %></div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Alert Message -->
+    <% if (success_msg) { %>
+      <div class="alert alert-success alert-dismissible fade show rounded-4 border-0 shadow-sm mb-4" role="alert" id="success-alert">
+        <i class="fa-solid fa-circle-check me-2"></i> <%= success_msg %>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    <% } %>
+
+    <!-- PAGE CONTENT SWITCH -->
+
+    <!-- PAGE 1: DASHBOARD -->
+    <% if (page === 'dashboard') { %>
+      
+      <!-- Metrics Grid -->
+      <div class="row g-4 mb-4" id="dashboard-metrics-grid">
+        <div class="col-xl-2 col-md-4 col-sm-6">
+          <div class="card-custom metric-card h-100">
+            <div class="metric-icon-box" style="background: linear-gradient(135deg, #6366F1, #4F46E5);">
+              <i class="fa-solid fa-box-archive"></i>
+            </div>
+            <div>
+              <div class="metric-val"><%= dashboard_stats.total_products %></div>
+              <div class="metric-label">Total Products</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+          <div class="card-custom metric-card h-100">
+            <div class="metric-icon-box" style="background: linear-gradient(135deg, #00B87C, #009363);">
+              <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <div>
+              <div class="metric-val"><%= dashboard_stats.total_stock_units.toLocaleString() %></div>
+              <div class="metric-label">Stock Units</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+          <div class="card-custom metric-card h-100">
+            <div class="metric-icon-box" style="background: linear-gradient(135deg, #FF9C00, #E08800);">
+              <i class="fa-solid fa-indian-rupee-sign"></i>
+            </div>
+            <div>
+              <div class="metric-val">₹<%= dashboard_stats.total_stock_value.toLocaleString() %></div>
+              <div class="metric-label">Stock Value</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+          <div class="card-custom metric-card h-100">
+            <div class="metric-icon-box" style="background: linear-gradient(135deg, #0075FF, #0056BD);">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+              <div class="metric-val"><%= dashboard_stats.low_stock_count %></div>
+              <div class="metric-label">Low Stock</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+          <div class="card-custom metric-card h-100">
+            <div class="metric-icon-box" style="background: linear-gradient(135deg, #FF4C61, #D82F43);">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </div>
+            <div>
+              <div class="metric-val"><%= dashboard_stats.out_of_stock_count %></div>
+              <div class="metric-label">Out of Stock</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-xl-2 col-md-4 col-sm-6">
+          <div class="card-custom metric-card h-100">
+            <div class="metric-icon-box" style="background: linear-gradient(135deg, #00C5E0, #009BB0);">
+              <i class="fa-solid fa-truck-field"></i>
+            </div>
+            <div>
+              <div class="metric-val"><%= dashboard_stats.total_suppliers %></div>
+              <div class="metric-label">Suppliers</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Section -->
+      <div class="row g-4 mb-4">
+        <div class="col-lg-8">
+          <div class="card-custom h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="fw-bold mb-0">Inventory Movement</h5>
+              <span class="badge bg-light text-muted border">Latest Transactions</span>
+            </div>
+            <div style="position: relative; height: 300px;">
+              <canvas id="inventoryOverviewChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="card-custom h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="fw-bold mb-0">Stock Health</h5>
+              <i class="fa-solid fa-chart-pie text-muted"></i>
+            </div>
+            <div style="position: relative; height: 300px;">
+              <canvas id="stockHealthChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Low Stock Alert & Recent Transactions Grid -->
+      <div class="row g-4">
+        <div class="col-lg-6">
+          <div class="card-custom h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="fw-bold mb-0 text-danger">
+                <i class="fa-solid fa-bell me-2"></i>Low Stock Warning
+              </h5>
+              <a href="/app?page=low_stock" class="btn btn-sm btn-light rounded-pill">View All</a>
+            </div>
+
+            <% if (low_stock_products && low_stock_products.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table table-custom">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Shade</th>
+                      <th>Stock</th>
+                      <th>Min</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% low_stock_products.slice(0, 5).forEach(prod => { %>
+                      <tr>
+                        <td>
+                          <div class="fw-bold"><%= prod.name %></div>
+                          <div class="text-muted small"><%= prod.brand %></div>
+                        </td>
+                        <td><%= prod.shade || '-' %></td>
+                        <td>
+                          <span class="badge <%= prod.stock <= 0 ? 'badge-out' : 'badge-low' %>">
+                            <%= prod.stock %> <%= prod.unit %>
+                          </span>
+                        </td>
+                        <td><%= prod.minimum_stock %></td>
+                        <td>
+                          <a href="/app?page=product_details&id=<%= prod._id %>" class="btn btn-sm btn-outline-primary rounded-pill">View</a>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-circle-check text-success display-5 mb-3"></i>
+                <p class="mb-0 fw-medium">All products are sufficiently stocked.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card-custom h-100">
+            <div class="d-flex align-items-center justify-content-between mb-3">
+              <h5 class="fw-bold mb-0">Recent Stock Activity</h5>
+              <a href="/app?page=stock" class="btn btn-sm btn-light rounded-pill">View All</a>
+            </div>
+
+            <% if (transactions && transactions.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table table-custom">
+                  <thead>
+                    <tr>
+                      <th>Product</th>
+                      <th>Type</th>
+                      <th>Qty</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% transactions.slice(0, 5).forEach(tx => { %>
+                      <tr>
+                        <td>
+                          <div class="fw-bold"><%= tx.product_id ? tx.product_id.name : 'Unknown Product' %></div>
+                          <div class="text-muted small"><%= tx.note || '' %></div>
+                        </td>
+                        <td>
+                          <% if (tx.type === 'IN') { %>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill">IN</span>
+                          <% } else if (tx.type === 'OUT') { %>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill">OUT</span>
+                          <% } else { %>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill">ADJUST</span>
+                          <% } %>
+                        </td>
+                        <td class="fw-bold"><%= tx.quantity %></td>
+                        <td class="text-muted small"><%= new Date(tx.created_at).toLocaleDateString() %></td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="text-center py-5 text-muted">
+                <i class="fa-solid fa-list-check display-5 mb-3 text-secondary"></i>
+                <p class="mb-0">No stock transactions recorded yet.</p>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+
+    <!-- PAGE 2: INVENTORY -->
+    <% } else if (page === 'inventory') { %>
+      
+      <div class="card-custom mb-4">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+          <div>
+            <h4 class="fw-bold mb-1">Product Inventory</h4>
+            <p class="text-muted small mb-0">Manage and monitor all your paint, hardware & material stock.</p>
+          </div>
+          <% if (user.role === 'admin') { %>
+            <a href="/app?page=add_product" class="btn btn-primary rounded-3 px-4">
+              <i class="fa-solid fa-plus me-2"></i>Add New Product
+            </a>
+          <% } %>
+        </div>
+
+        <!-- Filter Form -->
+        <form action="/app" method="GET" class="row g-3 p-3 bg-light rounded-4 mb-4">
+          <input type="hidden" name="page" value="inventory">
+          <div class="col-md-3">
+            <label class="form-label-custom">Search</label>
+            <input type="text" name="search" class="form-control form-control-custom" placeholder="Name, Brand, Shade..." value="<%= filters.search %>">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-custom">Category</label>
+            <select name="category" class="form-select form-select-custom">
+              <option value="">All Categories</option>
+              <% categories.forEach(cat => { %>
+                <option value="<%= cat %>" <%= filters.category === cat ? 'selected' : '' %>><%= cat %></option>
+              <% }); %>
+            </select>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label-custom">Stock Status</label>
+            <select name="stock_status" class="form-select form-select-custom">
+              <option value="all" <%= filters.stock_status === 'all' ? 'selected' : '' %>>All Statuses</option>
+              <option value="in_stock" <%= filters.stock_status === 'in_stock' ? 'selected' : '' %>>In Stock</option>
+              <option value="low_stock" <%= filters.stock_status === 'low_stock' ? 'selected' : '' %>>Low Stock</option>
+              <option value="out_of_stock" <%= filters.stock_status === 'out_of_stock' ? 'selected' : '' %>>Out of Stock</option>
+            </select>
+          </div>
+          <div class="col-md-3 d-flex align-items-end gap-2">
+            <button type="submit" class="btn btn-primary rounded-3 w-100">
+              <i class="fa-solid fa-filter me-1"></i>Filter
+            </button>
+            <a href="/app?page=inventory" class="btn btn-outline-secondary rounded-3">Reset</a>
+          </div>
+        </form>
+
+        <!-- Product Table -->
+        <div class="table-responsive">
+          <table class="table table-custom align-middle">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Shade</th>
+                <th>Pack Size</th>
+                <th>Stock</th>
+                <th>Purchase</th>
+                <th>Selling</th>
+                <th>Stock Value</th>
+                <th>Status</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (products && products.length > 0) { %>
+                <% products.forEach(prod => { %>
+                  <tr>
+                    <td>
+                      <div class="fw-bold"><%= prod.name %></div>
+                      <div class="text-muted small"><%= prod.brand %></div>
+                    </td>
+                    <td><%= prod.category %></td>
+                    <td><%= prod.shade || '-' %></td>
+                    <td><%= prod.size %> <%= prod.unit %></td>
+                    <td class="fw-bold">
+                      <%= prod.stock %> <%= prod.unit %>
+                      <div class="text-muted small" style="font-size: 11px;">Min: <%= prod.minimum_stock %></div>
+                    </td>
+                    <td>₹<%= prod.purchase_price %></td>
+                    <td>₹<%= prod.selling_price %></td>
+                    <td class="fw-bold text-success">₹<%= (prod.stock * prod.purchase_price).toLocaleString() %></td>
+                    <td>
+                      <% if (prod.stock <= 0) { %>
+                        <span class="badge badge-out"><i class="fa-solid fa-circle"></i> Out of Stock</span>
+                      <% } else if (prod.stock <= prod.minimum_stock) { %>
+                        <span class="badge badge-low"><i class="fa-solid fa-circle"></i> Low Stock</span>
+                      <% } else { %>
+                        <span class="badge badge-in"><i class="fa-solid fa-circle"></i> In Stock</span>
+                      <% } %>
+                    </td>
+                    <td class="text-end">
+                      <div class="btn-group">
+                        <a href="/app?page=product_details&id=<%= prod._id %>" class="btn btn-sm btn-light" title="View Details">
+                          <i class="fa-solid fa-eye text-primary"></i>
+                        </a>
+                        <button type="button" class="btn btn-sm btn-light" title="Update Stock" onclick="openStockModal('<%= prod._id %>', '<%= prod.name %>', <%= prod.stock %>)">
+                          <i class="fa-solid fa-boxes-packing text-warning"></i>
+                        </button>
+                        <% if (user.role === 'admin') { %>
+                          <button type="button" class="btn btn-sm btn-light" title="Edit Product" onclick="openEditModal('<%= JSON.stringify(prod) %>')">
+                            <i class="fa-solid fa-pen-to-square text-secondary"></i>
+                          </button>
+                          <a href="/app?page=inventory&delete=true&table=products&id=<%= prod._id %>" class="btn btn-sm btn-light text-danger" title="Delete" onclick="return confirm('Are you sure you want to delete this product?');">
+                            <i class="fa-solid fa-trash-can"></i>
+                          </a>
+                        <% } %>
+                      </div>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="10" class="text-center py-5 text-muted">
+                    <i class="fa-solid fa-box-open display-5 mb-3 text-secondary"></i>
+                    <p class="mb-0">No products found matching your filter criteria.</p>
+                  </td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <!-- PAGE 3: ADD PRODUCT -->
+    <% } else if (page === 'add_product') { %>
+      
+      <div class="card-custom max-width-900 mx-auto">
+        <h4 class="fw-bold mb-1">Add New Product</h4>
+        <p class="text-muted small mb-4">Enter complete details to register a new paint or shop item into inventory.</p>
+
+        <form action="/app" method="POST">
+          <input type="hidden" name="action" value="add_product">
+          <input type="hidden" name="page" value="inventory">
+
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label-custom">Product Name *</label>
+              <input type="text" name="name" class="form-control form-control-custom" placeholder="e.g. Apex Weather Proof Emulsion" required>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-custom">Brand</label>
+              <input type="text" name="brand" class="form-control form-control-custom" placeholder="e.g. Asian Paints, Berger, Nerolac">
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label-custom">Category *</label>
+              <select name="category" class="form-select form-select-custom" required>
+                <% categories.forEach(cat => { %>
+                  <option value="<%= cat %>"><%= cat %></option>
+                <% }); %>
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-custom">Subcategory</label>
+              <input type="text" name="subcategory" class="form-control form-control-custom" placeholder="e.g. Emulsion, Enamel, Acrylic">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label-custom">Shade / Color Code</label>
+              <input type="text" name="shade" class="form-control form-control-custom" placeholder="e.g. White 101, Morning Light">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label-custom">Pack Size</label>
+              <input type="text" name="size" class="form-control form-control-custom" placeholder="e.g. 1, 4, 10, 20">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label-custom">Unit</label>
+              <select name="unit" class="form-select form-select-custom">
+                <option value="L">Liters (L)</option>
+                <option value="Kg">Kilograms (Kg)</option>
+                <option value="Piece">Pieces</option>
+                <option value="Can">Can / Bucket</option>
+                <option value="Meter">Meters</option>
+                <option value="Box">Box</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label-custom">Purchase Price (₹)</label>
+              <input type="number" step="0.01" name="purchase_price" class="form-control form-control-custom" placeholder="0.00">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label-custom">Selling Price (₹)</label>
+              <input type="number" step="0.01" name="selling_price" class="form-control form-control-custom" placeholder="0.00">
+            </div>
+
+            <div class="col-md-4">
+              <label class="form-label-custom">Initial Stock Quantity</label>
+              <input type="number" name="stock" class="form-control form-control-custom" value="0" min="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label-custom">Minimum Stock Warning Level</label>
+              <input type="number" name="minimum_stock" class="form-control form-control-custom" value="5" min="0">
+            </div>
+            <div class="col-md-4">
+              <label class="form-label-custom">Supplier</label>
+              <select name="supplier" class="form-select form-select-custom">
+                <option value="">Select Supplier</option>
+                <% suppliers.forEach(sup => { %>
+                  <option value="<%= sup.name %>"><%= sup.name %></option>
+                <% }); %>
+              </select>
+            </div>
+
+            <div class="col-12">
+              <label class="form-label-custom">Description / Notes</label>
+              <textarea name="description" class="form-control form-control-custom" rows="3" placeholder="Additional specifications or shop storage notes..."></textarea>
+            </div>
+
+            <div class="col-12 pt-3">
+              <button type="submit" class="btn btn-primary rounded-3 px-5 py-2 fw-semibold">
+                <i class="fa-solid fa-floppy-disk me-2"></i>Save Product
+              </button>
+              <a href="/app?page=inventory" class="btn btn-outline-secondary rounded-3 px-4 py-2 ms-2">Cancel</a>
+            </div>
+          </div>
+        </form>
+      </div>
+
+    <!-- PAGE 4: STOCK MANAGEMENT -->
+    <% } else if (page === 'stock') { %>
+      
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <h5 class="fw-bold mb-1">Quick Stock Update</h5>
+            <p class="text-muted small mb-4">Record stock addition, sale (OUT), or manual adjustment.</p>
+
+            <form action="/app" method="POST">
+              <input type="hidden" name="page" value="stock">
+              
+              <div class="mb-3">
+                <label class="form-label-custom">Select Product *</label>
+                <select name="product_id" class="form-select form-select-custom" required>
+                  <option value="">Choose a product...</option>
+                  <% products.forEach(prod => { %>
+                    <option value="<%= prod._id %>"><%= prod.name %> (<%= prod.shade || prod.brand %>) - Current: <%= prod.stock %></option>
+                  <% }); %>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-custom">Operation Type *</label>
+                <select name="action" class="form-select form-select-custom" required>
+                  <option value="add_stock">Stock IN (Purchase/Restock)</option>
+                  <option value="remove_stock">Stock OUT (Sale/Usage)</option>
+                  <option value="adjust_stock">Manual Adjustment (Correction)</option>
+                </select>
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label-custom">Quantity / New Stock Level *</label>
+                <input type="number" name="quantity" class="form-control form-control-custom" placeholder="Enter quantity" required min="1">
+              </div>
+
+              <div class="mb-4">
+                <label class="form-label-custom">Note / Reference</label>
+                <input type="text" name="note" class="form-control form-control-custom" placeholder="e.g. Invoice #102 or Customer Sale">
+              </div>
+
+              <button type="submit" class="btn btn-primary rounded-3 w-100 py-2 fw-semibold">
+                <i class="fa-solid fa-arrows-rotate me-2"></i>Update Stock
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="card-custom">
+            <h5 class="fw-bold mb-1">Stock Movement History</h5>
+            <p class="text-muted small mb-4">Full log of recent stock additions, removals, and adjustments.</p>
+
+            <div class="table-responsive">
+              <table class="table table-custom align-middle">
+                <thead>
+                  <tr>
+                    <th>Date & Time</th>
+                    <th>Product</th>
+                    <th>Type</th>
+                    <th>Quantity</th>
+                    <th>Note</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (transactions && transactions.length > 0) { %>
+                    <% transactions.forEach(tx => { %>
+                      <tr>
+                        <td class="text-muted small"><%= new Date(tx.created_at).toLocaleString() %></td>
+                        <td>
+                          <div class="fw-bold"><%= tx.product_id ? tx.product_id.name : 'Deleted Product' %></div>
+                          <% if (tx.product_id && tx.product_id.shade) { %>
+                            <div class="text-muted small"><%= tx.product_id.shade %></div>
+                          <% } %>
+                        </td>
+                        <td>
+                          <% if (tx.type === 'IN') { %>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill"><i class="fa-solid fa-arrow-down-left me-1"></i> IN</span>
+                          <% } else if (tx.type === 'OUT') { %>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill"><i class="fa-solid fa-arrow-up-right me-1"></i> OUT</span>
+                          <% } else { %>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill"><i class="fa-solid fa-sliders me-1"></i> ADJUST</span>
+                          <% } %>
+                        </td>
+                        <td class="fw-bold"><%= tx.quantity %></td>
+                        <td class="text-muted small"><%= tx.note || '-' %></td>
+                      </tr>
+                    <% }); %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="5" class="text-center py-5 text-muted">No stock movement transactions recorded yet.</td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- PAGE 5: LOW STOCK WARNING -->
+    <% } else if (page === 'low_stock') { %>
+      
+      <div class="card-custom">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold mb-1 text-danger">Low Stock Warning</h4>
+            <p class="text-muted small mb-0">Products running below or equal to their minimum safety threshold.</p>
+          </div>
+        </div>
+
+        <% if (low_stock_products && low_stock_products.length > 0) { %>
+          <div class="table-responsive">
+            <table class="table table-custom align-middle">
+              <thead>
+                <tr>
+                  <th>Product</th>
+                  <th>Brand</th>
+                  <th>Category</th>
+                  <th>Shade</th>
+                  <th>Current Stock</th>
+                  <th>Minimum</th>
+                  <th>Supplier</th>
+                  <th>Status</th>
+                  <th class="text-end">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% low_stock_products.forEach(prod => { %>
+                  <tr>
+                    <td>
+                      <div class="fw-bold"><%= prod.name %></div>
+                    </td>
+                    <td><%= prod.brand %></td>
+                    <td><%= prod.category %></td>
+                    <td><%= prod.shade || '-' %></td>
+                    <td class="fw-bold text-danger"><%= prod.stock %> <%= prod.unit %></td>
+                    <td><%= prod.minimum_stock %></td>
+                    <td><%= prod.supplier || '-' %></td>
+                    <td>
+                      <% if (prod.stock <= 0) { %>
+                        <span class="badge badge-out">Out of Stock</span>
+                      <% } else { %>
+                        <span class="badge badge-low">Low Stock</span>
+                      <% } %>
+                    </td>
+                    <td class="text-end">
+                      <button class="btn btn-sm btn-primary rounded-pill" onclick="openStockModal('<%= prod._id %>', '<%= prod.name %>', <%= prod.stock %>)">
+                        <i class="fa-solid fa-plus me-1"></i>Restock
+                      </button>
+                    </td>
+                  </tr>
+                <% }); %>
+              </tbody>
+            </table>
+          </div>
+        <% } else { %>
+          <div class="text-center py-5">
+            <i class="fa-solid fa-circle-check text-success display-3 mb-3"></i>
+            <h5 class="fw-bold">No Low-Stock Products</h5>
+            <p class="text-muted">All items in your shop inventory are sufficiently stocked above minimum levels.</p>
+          </div>
+        <% } %>
+      </div>
+
+    <!-- PAGE 6: PRODUCT DETAILS -->
+    <% } else if (page === 'product_details') { %>
+      
+      <% if (selected_product) { %>
+        <div class="row g-4">
+          <div class="col-lg-5">
+            <div class="card-custom h-100">
+              <div class="d-flex align-items-center justify-content-between mb-3">
+                <span class="badge bg-primary-subtle text-primary rounded-pill px-3 py-2"><%= selected_product.category %></span>
+                <span class="text-muted small">ID: <%= selected_product._id %></span>
+              </div>
+
+              <h3 class="fw-bold text-dark mb-1"><%= selected_product.name %></h3>
+              <p class="text-muted mb-4"><%= selected_product.brand %></p>
+
+              <div class="p-3 bg-light rounded-4 mb-4">
+                <div class="row g-3 text-center">
+                  <div class="col-6 border-end">
+                    <div class="text-muted small">Current Stock</div>
+                    <div class="fs-3 fw-bold <%= selected_product.stock <= selected_product.minimum_stock ? 'text-danger' : 'text-success' %>">
+                      <%= selected_product.stock %> <%= selected_product.unit %>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="text-muted small">Stock Value</div>
+                    <div class="fs-3 fw-bold text-dark">
+                      ₹<%= (selected_product.stock * selected_product.purchase_price).toLocaleString() %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="list-group list-group-flush border-0 mb-4">
+                <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                  <span class="text-muted">Shade / Color Code</span>
+                  <span class="fw-bold"><%= selected_product.shade || '-' %></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                  <span class="text-muted">Pack Size</span>
+                  <span class="fw-bold"><%= selected_product.size %> <%= selected_product.unit %></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                  <span class="text-muted">Purchase Price</span>
+                  <span class="fw-bold">₹<%= selected_product.purchase_price %></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                  <span class="text-muted">Selling Price</span>
+                  <span class="fw-bold">₹<%= selected_product.selling_price %></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                  <span class="text-muted">Minimum Warning Threshold</span>
+                  <span class="fw-bold"><%= selected_product.minimum_stock %> <%= selected_product.unit %></span>
+                </div>
+                <div class="list-group-item d-flex justify-content-between px-0 py-2 border-0">
+                  <span class="text-muted">Supplier</span>
+                  <span class="fw-bold"><%= selected_product.supplier || '-' %></span>
+                </div>
+              </div>
+
+              <div class="mb-4">
+                <div class="fw-bold text-muted small mb-1">Description / Notes</div>
+                <p class="small text-secondary mb-0"><%= selected_product.description || 'No description provided.' %></p>
+              </div>
+
+              <div class="d-flex gap-2">
+                <button class="btn btn-primary rounded-3 w-100" onclick="openStockModal('<%= selected_product._id %>', '<%= selected_product.name %>', <%= selected_product.stock %>)">
+                  Update Stock
+                </button>
+                <a href="/app?page=inventory" class="btn btn-outline-secondary rounded-3">Back</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="card-custom h-100">
+              <h5 class="fw-bold mb-3">Stock Movement History</h5>
+
+              <div class="table-responsive">
+                <table class="table table-custom align-middle">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Type</th>
+                      <th>Quantity</th>
+                      <th>Note</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% if (product_transactions && product_transactions.length > 0) { %>
+                      <% product_transactions.forEach(tx => { %>
+                        <tr>
+                          <td class="text-muted small"><%= new Date(tx.created_at).toLocaleString() %></td>
+                          <td>
+                            <% if (tx.type === 'IN') { %>
+                              <span class="badge bg-success-subtle text-success rounded-pill">IN</span>
+                            <% } else if (tx.type === 'OUT') { %>
+                              <span class="badge bg-danger-subtle text-danger rounded-pill">OUT</span>
+                            <% } else { %>
+                              <span class="badge bg-warning-subtle text-warning rounded-pill">ADJUST</span>
+                            <% } %>
+                          </td>
+                          <td class="fw-bold"><%= tx.quantity %></td>
+                          <td class="text-muted small"><%= tx.note || '-' %></td>
+                        </tr>
+                      <% }); %>
+                    <% } else { %>
+                      <tr>
+                        <td colspan="4" class="text-center py-5 text-muted">No history for this product.</td>
+                      </tr>
+                    <% } %>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% } else { %>
+        <div class="card-custom text-center py-5">
+          <i class="fa-solid fa-triangle-exclamation text-warning display-4 mb-3"></i>
+          <h5>Product Not Found</h5>
+          <a href="/app?page=inventory" class="btn btn-primary rounded-3 mt-2">Return to Inventory</a>
+        </div>
+      <% } %>
+
+    <!-- PAGE 7: SUPPLIERS -->
+    <% } else if (page === 'suppliers') { %>
+      
+      <div class="row g-4">
+        <div class="col-lg-4">
+          <div class="card-custom">
+            <h5 class="fw-bold mb-1">Add Supplier</h5>
+            <p class="text-muted small mb-4">Register new paint distributor or hardware vendor.</p>
+
+            <form action="/app" method="POST">
+              <input type="hidden" name="action" value="add_supplier">
+              <input type="hidden" name="page" value="suppliers">
+
+              <div class="mb-3">
+                <label class="form-label-custom">Supplier Name *</label>
+                <input type="text" name="name" class="form-control form-control-custom" placeholder="e.g. Asian Paints Direct Distributor" required>
+              </div>
+              <div class="mb-3">
+                <label class="form-label-custom">Phone Number</label>
+                <input type="text" name="phone" class="form-control form-control-custom" placeholder="+91 9876543210">
+              </div>
+              <div class="mb-3">
+                <label class="form-label-custom">Email Address</label>
+                <input type="email" name="email" class="form-control form-control-custom" placeholder="supplier@paints.com">
+              </div>
+              <div class="mb-4">
+                <label class="form-label-custom">Address</label>
+                <textarea name="address" class="form-control form-control-custom" rows="3" placeholder="Warehouse address..."></textarea>
+              </div>
+
+              <button type="submit" class="btn btn-primary rounded-3 w-100 py-2 fw-semibold">
+                <i class="fa-solid fa-plus me-2"></i>Save Supplier
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="card-custom">
+            <h5 class="fw-bold mb-3">Registered Suppliers</h5>
+
+            <div class="table-responsive">
+              <table class="table table-custom align-middle">
+                <thead>
+                  <tr>
+                    <th>Supplier</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <% if (user.role === 'admin') { %>
+                      <th class="text-end">Actions</th>
+                    <% } %>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% if (suppliers && suppliers.length > 0) { %>
+                    <% suppliers.forEach(sup => { %>
+                      <tr>
+                        <td class="fw-bold"><%= sup.name %></td>
+                        <td><%= sup.phone || '-' %></td>
+                        <td><%= sup.email || '-' %></td>
+                        <td class="text-muted small"><%= sup.address || '-' %></td>
+                        <% if (user.role === 'admin') { %>
+                          <td class="text-end">
+                            <a href="/app?page=suppliers&delete=true&table=suppliers&id=<%= sup._id %>" class="btn btn-sm btn-light text-danger" onclick="return confirm('Delete this supplier?');">
+                              <i class="fa-solid fa-trash-can"></i>
+                            </a>
+                          </td>
+                        <% } %>
+                      </tr>
+                    <% }); %>
+                  <% } else { %>
+                    <tr>
+                      <td colspan="5" class="text-center py-5 text-muted">No suppliers registered yet.</td>
+                    </tr>
+                  <% } %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <!-- PAGE 8: STAFF MANAGEMENT (ADMIN ONLY) -->
+    <% } else if (page === 'staff' && user.role === 'admin') { %>
+      
+      <div class="card-custom">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h4 class="fw-bold mb-1">Staff Management</h4>
+            <p class="text-muted small mb-0">Manage employee accounts and shop access levels.</p>
+          </div>
+          <button class="btn btn-primary rounded-3" data-bs-toggle="modal" data-bs-target="#addStaffModal">
+            <i class="fa-solid fa-user-plus me-2"></i>Add Staff Member
+          </button>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-custom align-middle">
+            <thead>
+              <tr>
+                <th>Staff Member</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Joined Date</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (staffs && staffs.length > 0) { %>
+                <% staffs.forEach(st => { %>
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center gap-3">
+                        <img src="https://ui-avatars.com/api/?name=<%= encodeURIComponent(st.full_name) %>&background=E2E8F0&color=2B3674" class="rounded-circle" width="36" height="36">
+                        <div class="fw-bold"><%= st.full_name %></div>
+                      </div>
+                    </td>
+                    <td><%= st.email %></td>
+                    <td><span class="badge bg-secondary-subtle text-dark uppercase"><%= st.role %></span></td>
+                    <td class="text-muted small"><%= new Date(st.created_at).toLocaleDateString() %></td>
+                    <td class="text-end">
+                      <a href="/app?page=staff&delete=true&table=staff&id=<%= st._id %>" class="btn btn-sm btn-light text-danger" onclick="return confirm('Delete staff member?');">
+                        <i class="fa-solid fa-trash-can"></i>
+                      </a>
+                    </td>
+                  </tr>
+                <% }); %>
+              <% } else { %>
+                <tr>
+                  <td colspan="5" class="text-center py-5 text-muted">No staff members created yet.</td>
+                </tr>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <!-- PAGE 9: REPORTS -->
+    <% } else if (page === 'reports' && user.role === 'admin') { %>
+      
+      <div class="row g-4 mb-4">
+        <div class="col-md-3">
+          <div class="card-custom">
+            <div class="text-muted small mb-1">Total Stock IN</div>
+            <div class="fs-3 fw-bold text-success"><%= reports_data ? reports_data.total_stock_in.toLocaleString() : 0 %></div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-custom">
+            <div class="text-muted small mb-1">Total Stock OUT</div>
+            <div class="fs-3 fw-bold text-danger"><%= reports_data ? reports_data.total_stock_out.toLocaleString() : 0 %></div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-custom">
+            <div class="text-muted small mb-1">Total Inventory Value</div>
+            <div class="fs-3 fw-bold text-primary">₹<%= dashboard_stats.total_stock_value.toLocaleString() %></div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card-custom">
+            <div class="text-muted small mb-1">Out of Stock Items</div>
+            <div class="fs-3 fw-bold text-warning"><%= dashboard_stats.out_of_stock_count %></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+          <div class="card-custom">
+            <h5 class="fw-bold mb-3">Stock Movement Analysis</h5>
+            <div style="position: relative; height: 280px;">
+              <canvas id="reportsStockChart"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card-custom">
+            <h5 class="fw-bold mb-3">Category Distribution</h5>
+            <div style="position: relative; height: 280px;">
+              <canvas id="reportsCategoryChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-custom">
+        <h5 class="fw-bold mb-3">Most Valuable Inventory Items</h5>
+        <div class="table-responsive">
+          <table class="table table-custom align-middle">
+            <thead>
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Stock</th>
+                <th>Purchase Price</th>
+                <th>Total Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% if (reports_data && reports_data.most_valuable_products) { %>
+                <% reports_data.most_valuable_products.forEach(p => { %>
+                  <tr>
+                    <td class="fw-bold"><%= p.name %></td>
+                    <td><%= p.category %></td>
+                    <td><%= p.stock %> <%= p.unit %></td>
+                    <td>₹<%= p.purchase_price %></td>
+                    <td class="fw-bold text-success">₹<%= (p.stock * p.purchase_price).toLocaleString() %></td>
+                  </tr>
+                <% }); %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    <% } %>
+
+  </main>
+
+  <!-- MODALS -->
+
+  <!-- Edit Product Modal -->
+  <div class="modal fade" id="editProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-bottom-0 pb-0">
+          <h5 class="modal-title fw-bold">Edit Product Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/app" method="POST">
+          <input type="hidden" name="action" value="edit_product">
+          <input type="hidden" name="page" value="inventory">
+          <input type="hidden" name="id" id="edit-prod-id">
+
+          <div class="modal-body">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label-custom">Product Name</label>
+                <input type="text" name="name" id="edit-prod-name" class="form-control form-control-custom" required>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom">Brand</label>
+                <input type="text" name="brand" id="edit-prod-brand" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom">Category</label>
+                <select name="category" id="edit-prod-category" class="form-select form-select-custom">
+                  <% categories.forEach(cat => { %>
+                    <option value="<%= cat %>"><%= cat %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label-custom">Subcategory</label>
+                <input type="text" name="subcategory" id="edit-prod-subcategory" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label-custom">Shade</label>
+                <input type="text" name="shade" id="edit-prod-shade" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label-custom">Pack Size</label>
+                <input type="text" name="size" id="edit-prod-size" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label-custom">Unit</label>
+                <input type="text" name="unit" id="edit-prod-unit" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label-custom">Purchase Price (₹)</label>
+                <input type="number" step="0.01" name="purchase_price" id="edit-prod-purchase" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label-custom">Selling Price (₹)</label>
+                <input type="number" step="0.01" name="selling_price" id="edit-prod-selling" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-4">
+                <label class="form-label-custom">Minimum Stock</label>
+                <input type="number" name="minimum_stock" id="edit-prod-min" class="form-control form-control-custom">
+              </div>
+              <div class="col-md-12">
+                <label class="form-label-custom">Supplier</label>
+                <select name="supplier" id="edit-prod-supplier" class="form-select form-select-custom">
+                  <option value="">Select Supplier</option>
+                  <% suppliers.forEach(sup => { %>
+                    <option value="<%= sup.name %>"><%= sup.name %></option>
+                  <% }); %>
+                </select>
+              </div>
+              <div class="col-md-12">
+                <label class="form-label-custom">Description</label>
+                <textarea name="description" id="edit-prod-desc" class="form-control form-control-custom" rows="2"></textarea>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer border-top-0">
+            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary rounded-3 px-4">Save Changes</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stock Modal -->
+  <div class="modal fade" id="stockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0">
+        <div class="modal-header border-bottom-0">
+          <h5 class="modal-title fw-bold" id="stock-modal-title">Update Stock</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <form action="/app" method="POST">
+          <input type="hidden" name="page" value="<%= page %>">
+          <input type="hidden" name="product_id" id="stock-prod-id">
+
+          <div class="modal-body">
+            <p class="text-muted small" id="stock-prod-name-display"></p>
+            
+            <div class="mb-3">
+              <label class="form-label-custom">Action Type</label>
+              <select name="action" class="form-select form-select-custom" required>
+                <option value="add_stock">Add Stock (IN)</option>
+                <option value="remove_stock">Remove Stock (OUT / Sale)</option>
+                <option value="adjust_stock">Adjust Stock Level</option>
+              </select>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label-custom">Quantity / New Level</label>
+              <input type="number" name="quantity" class="form-control form-control-custom" placeholder="Enter quantity" required min="1">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label-custom">Note / Ref</label>
+              <input type="text" name="note" class="form-control form-control-custom" placeholder="e.g. Counter sale or supplier shipment">
+            </div>
+          </div>
+          <div class="modal-footer border-top-0">
+            <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary rounded-3 px-4">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Staff Modal -->
+  <% if (user.role === 'admin') { %>
+    <div class="modal fade" id="addStaffModal" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0">
+          <div class="modal-header border-bottom-0">
+            <h5 class="modal-title fw-bold">Add Staff Member</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form action="/app" method="POST">
+            <input type="hidden" name="action" value="add_staff">
+            <input type="hidden" name="page" value="staff">
+
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label-custom">Full Name *</label>
+                <input type="text" name="full_name" class="form-control form-control-custom" required placeholder="e.g. Rajesh Kumar">
+              </div>
+              <div class="mb-3">
+                <label class="form-label-custom">Email Address *</label>
+                <input type="email" name="email" class="form-control form-control-custom" required placeholder="rajesh@paintshop.com">
+              </div>
+              <div class="mb-3">
+                <label class="form-label-custom">Password</label>
+                <input type="password" name="password" class="form-control form-control-custom" value="123456" placeholder="Default: 123456">
+                <div class="form-text small">Default password is set to 123456</div>
+              </div>
+            </div>
+            <div class="modal-footer border-top-0">
+              <button type="button" class="btn btn-light rounded-3" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary rounded-3 px-4">Create Staff</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function openEditModal(prodJson) {
+      try {
+        const prod = JSON.parse(prodJson);
+        document.getElementById('edit-prod-id').value = prod._id || '';
+        document.getElementById('edit-prod-name').value = prod.name || '';
+        document.getElementById('edit-prod-brand').value = prod.brand || '';
+        document.getElementById('edit-prod-category').value = prod.category || '';
+        document.getElementById('edit-prod-subcategory').value = prod.subcategory || '';
+        document.getElementById('edit-prod-shade').value = prod.shade || '';
+        document.getElementById('edit-prod-size').value = prod.size || '';
+        document.getElementById('edit-prod-unit').value = prod.unit || 'L';
+        document.getElementById('edit-prod-purchase').value = prod.purchase_price || 0;
+        document.getElementById('edit-prod-selling').value = prod.selling_price || 0;
+        document.getElementById('edit-prod-min').value = prod.minimum_stock || 5;
+        document.getElementById('edit-prod-supplier').value = prod.supplier || '';
+        document.getElementById('edit-prod-desc').value = prod.description || '';
+
+        const modal = new bootstrap.Modal(document.getElementById('editProductModal'));
+        modal.show();
+      } catch (e) {
+        console.error("Error opening edit modal:", e);
+      }
+    }
+
+    function openStockModal(prodId, prodName, currentStock) {
+      document.getElementById('stock-prod-id').value = prodId;
+      document.getElementById('stock-prod-name-display').innerText = 'Product: ' + prodName + ' | Current Stock: ' + currentStock;
+      const modal = new bootstrap.Modal(document.getElementById('stockModal'));
+      modal.show();
+    }
+
+    // Chart.js Initializations
+    document.addEventListener('DOMContentLoaded', function() {
+      <% if (page === 'dashboard' && dashboard_stats) { %>
+        // Stock Health Chart
+        const healthCtx = document.getElementById('stockHealthChart');
+        if (healthCtx) {
+          new Chart(healthCtx, {
+            type: 'doughnut',
+            data: {
+              labels: ['In Stock', 'Low Stock', 'Out of Stock'],
+              datasets: [{
+                data: [
+                  <%= dashboard_stats.total_products - dashboard_stats.low_stock_count - dashboard_stats.out_of_stock_count %>,
+                  <%= dashboard_stats.low_stock_count %>,
+                  <%= dashboard_stats.out_of_stock_count %>
+                ],
+                backgroundColor: ['#00B87C', '#FF9C00', '#FF4C61'],
+                borderWidth: 0
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { position: 'bottom' }
+              }
+            }
+          });
+        }
+
+        // Overview Chart
+        const overviewCtx = document.getElementById('inventoryOverviewChart');
+        if (overviewCtx) {
+          new Chart(overviewCtx, {
+            type: 'bar',
+            data: {
+              labels: ['Interior', 'Exterior', 'Primer', 'Putty', 'Enamel', 'Distemper', 'Other'],
+              datasets: [{
+                label: 'Products Count',
+                data: [12, 19, 8, 5, 10, 6, 4],
+                backgroundColor: '#6366F1',
+                borderRadius: 8
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: { y: { beginAtZero: true } }
+            }
+          });
+        }
+      <% } %>
+
+      <% if (page === 'reports' && reports_data) { %>
+        const repStockCtx = document.getElementById('reportsStockChart');
+        if (repStockCtx) {
+          new Chart(repStockCtx, {
+            type: 'pie',
+            data: {
+              labels: ['Total Stock IN', 'Total Stock OUT'],
+              datasets: [{
+                data: [<%= reports_data.total_stock_in %>, <%= reports_data.total_stock_out %>],
+                backgroundColor: ['#00B87C', '#FF4C61']
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false }
+          });
+        }
+
+        const repCatCtx = document.getElementById('reportsCategoryChart');
+        if (repCatCtx) {
+          const catLabels = <%- JSON.stringify(Object.keys(reports_data.category_counts)) %>;
+          const catValues = <%- JSON.stringify(Object.values(reports_data.category_counts)) %>;
+          new Chart(repCatCtx, {
+            type: 'bar',
+            data: {
+              labels: catLabels,
+              datasets: [{
+                label: 'Products per Category',
+                data: catValues,
+                backgroundColor: '#0075FF',
+                borderRadius: 6
+              }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+          });
+        }
+      <% } %>
+    });
+  </script>
+</body>
+</html>
